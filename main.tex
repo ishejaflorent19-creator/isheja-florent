@@ -1,0 +1,893 @@
+\documentclass[12pt,a4paper]{article}
+
+% -------------------------------------------------
+% PACKAGES
+% -------------------------------------------------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{titlesec}
+
+% -------------------------------------------------
+% DOCUMENT SETTINGS
+% -------------------------------------------------
+\onehalfspacing
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Chapter 4: Classification}
+\lhead{Statistical Learning}
+\cfoot{\thepage}
+
+\titleformat{\section}
+{\Large\bfseries}
+{\thesection}
+{1em}
+{}
+
+\titleformat{\subsection}
+{\large\bfseries}
+{\thesubsection}
+{1em}
+{}
+
+% -------------------------------------------------
+% PYTHON CODE STYLE
+% -------------------------------------------------
+\definecolor{codegreen}{rgb}{0,0.5,0}
+\definecolor{codegray}{rgb}{0.45,0.45,0.45}
+\definecolor{codepurple}{rgb}{0.45,0,0.7}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{codegreen},
+    stringstyle=\color{codepurple},
+    numberstyle=\tiny\color{codegray},
+    numbers=left,
+    numbersep=8pt,
+    frame=single,
+    breaklines=true,
+    showstringspaces=false,
+    tabsize=4
+}
+
+% -------------------------------------------------
+% TITLE PAGE
+% -------------------------------------------------
+
+\begin{document}
+
+\begin{titlepage}
+
+\centering
+
+\vspace*{1.5cm}
+
+{\Large \textbf{STATISTICAL LEARNING}}\\[0.5cm]
+
+{\Huge \textbf{Chapter 4: Classification}}\\[0.5cm]
+
+{\Large Exercises 5, 10, 14 and 16}\\[1.5cm]
+
+\rule{\textwidth}{0.5pt}\\[0.5cm]
+
+{\Large \textbf{An Introduction to Statistical Learning\\
+with Applications in Python}}\\[0.5cm]
+
+\rule{\textwidth}{0.5pt}
+
+\vfill
+
+\begin{tabular}{rl}
+\textbf{Name:} & Eliane UMWALI \\[0.3cm]
+\textbf{Student ID:} & 101206 \\[0.3cm]
+\textbf{Chapter:} & 4 -- Classification \\[0.3cm]
+\textbf{Software:} & Python / Jupyter Notebook \\[0.3cm]
+\textbf{Book:} & An Introduction to Statistical Learning with Applications in Python
+\end{tabular}
+
+\vfill
+
+{\large \today}
+
+\end{titlepage}
+
+% -------------------------------------------------
+% CONTENTS
+% -------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% =================================================
+% INTRODUCTION
+% =================================================
+
+\section{Introduction}
+
+Classification is a supervised statistical learning problem in which the
+response variable is qualitative rather than quantitative. The objective is
+to use one or more predictors to assign an observation to one of two or
+more classes.
+
+Chapter 4 of \textit{An Introduction to Statistical Learning with Applications
+in Python} introduces several important classification methods, including
+logistic regression, linear discriminant analysis (LDA), quadratic
+discriminant analysis (QDA), naive Bayes, and K-nearest neighbors (KNN).
+
+This report addresses Exercises 5, 10, 14, and 16 from the chapter. The
+first two exercises focus on the theoretical differences between LDA and
+QDA and the derivation of the LDA discriminant function for one predictor.
+Exercises 14 and 16 apply classification methods to the Auto and Boston
+datasets.
+
+For the computational exercises, the analysis was performed in Python using
+the ISLP datasets and scikit-learn classification methods.
+
+% =================================================
+% EXERCISE 5
+% =================================================
+
+\section{Exercise 5: LDA and QDA}
+
+\subsection{(a) Linear Bayes Decision Boundary}
+
+If the Bayes decision boundary is linear, QDA is expected to perform better
+on the training set because QDA is more flexible than LDA. Its greater
+flexibility allows it to fit the training observations at least as well as
+the more restricted LDA model.
+
+However, on the test set, LDA is expected to perform better. When the true
+Bayes decision boundary is linear, the additional flexibility of QDA is not
+necessary. QDA estimates a separate covariance matrix for each class, which
+results in more parameters and higher variance.
+
+Therefore:
+
+\begin{itemize}
+    \item \textbf{Training set:} QDA is expected to perform better.
+    \item \textbf{Test set:} LDA is expected to perform better.
+\end{itemize}
+
+The reason is the bias--variance trade-off. LDA is less flexible and
+therefore has lower variance, while QDA has greater flexibility but higher
+variance.
+
+\subsection{(b) Non-linear Bayes Decision Boundary}
+
+If the Bayes decision boundary is non-linear, QDA is expected to perform
+better on both the training and test sets.
+
+LDA assumes a common covariance matrix across the classes and consequently
+produces a linear decision boundary. QDA allows each class to have its own
+covariance matrix and therefore produces a quadratic decision boundary.
+
+Thus, when the true boundary is non-linear, QDA can represent the underlying
+relationship more accurately.
+
+\begin{itemize}
+    \item \textbf{Training set:} QDA is expected to perform better.
+    \item \textbf{Test set:} QDA is expected to perform better, provided
+    there are enough observations to estimate the additional parameters
+    reliably.
+\end{itemize}
+
+\subsection{(c) Effect of Increasing Sample Size}
+
+As the sample size $n$ increases, we expect the test prediction accuracy of
+QDA relative to LDA to improve.
+
+QDA estimates a separate covariance matrix for each class and consequently
+estimates more parameters than LDA. With a small sample size, these estimates
+can have high variance. As the sample size increases, the parameter
+estimates become more stable and the variance of QDA decreases.
+
+Therefore, QDA becomes more attractive relative to LDA as the sample size
+increases.
+
+\subsection{(d) True or False}
+
+\textbf{False.}
+
+Although QDA is flexible enough to model a linear decision boundary, this
+additional flexibility does not guarantee a lower test error.
+
+When the true Bayes decision boundary is linear, LDA already provides the
+appropriate form of decision boundary. QDA estimates more parameters and
+therefore has higher variance. The additional flexibility can lead to
+overfitting without providing a corresponding reduction in bias.
+
+Therefore, when the true boundary is linear, LDA will generally have better
+test performance than QDA.
+
+% =================================================
+% EXERCISE 10
+% =================================================
+
+\section{Exercise 10: LDA When $p=1$}
+
+For LDA, the log posterior odds between class $k$ and the reference class
+$K$ can be written as
+
+\[
+\log
+\left(
+\frac{\Pr(Y=k\mid X=x)}
+{\Pr(Y=K\mid X=x)}
+\right)
+=
+a_k+\sum_{j=1}^{p}b_{kj}x_j.
+\]
+
+When $p=1$, the mean vectors become scalars $\mu_k$ and $\mu_K$, while the
+shared covariance matrix becomes the scalar variance $\sigma^2$.
+
+The expression becomes
+
+\[
+\log
+\left(
+\frac{\Pr(Y=k\mid X=x)}
+{\Pr(Y=K\mid X=x)}
+\right)
+=
+\log\left(\frac{\pi_k}{\pi_K}\right)
+-\frac{(x-\mu_k)^2}{2\sigma^2}
++\frac{(x-\mu_K)^2}{2\sigma^2}.
+\]
+
+Expanding the squared terms gives
+
+\[
+\begin{aligned}
+&\log\left(\frac{\pi_k}{\pi_K}\right)
+-\frac{x^2-2x\mu_k+\mu_k^2}{2\sigma^2}
++\frac{x^2-2x\mu_K+\mu_K^2}{2\sigma^2}.
+\end{aligned}
+\]
+
+The $x^2$ terms cancel, giving
+
+\[
+\log\left(\frac{\pi_k}{\pi_K}\right)
+-\frac{\mu_k^2-\mu_K^2}{2\sigma^2}
++
+\frac{\mu_k-\mu_K}{\sigma^2}x.
+\]
+
+Comparing this with
+
+\[
+a_k+b_{k1}x,
+\]
+
+we obtain
+
+\[
+\boxed{
+a_k =
+\log\left(\frac{\pi_k}{\pi_K}\right)
+-\frac{\mu_k^2-\mu_K^2}{2\sigma^2}
+}
+\]
+
+and
+
+\[
+\boxed{
+b_{k1} =
+\frac{\mu_k-\mu_K}{\sigma^2}
+}.
+\]
+
+Thus, when there is only one predictor, the LDA log posterior odds are a
+linear function of $x$.
+
+% =================================================
+% EXERCISE 14
+% =================================================
+
+\section{Exercise 14: Auto Dataset}
+
+The objective of this exercise is to predict whether a vehicle has high or
+low gas mileage using the Auto dataset.
+
+\subsection{(a) Creating \texttt{mpg01}}
+
+The first step is to create a binary response variable called
+\texttt{mpg01}. The median of MPG is used as the threshold.
+
+Vehicles with MPG above the median are assigned a value of 1, while vehicles
+with MPG below the median are assigned a value of 0.
+
+The Python implementation was:
+
+\begin{lstlisting}
+from ISLP import load_data
+
+Auto = load_data('Auto')
+
+median_mpg = Auto['mpg'].median()
+
+Auto['mpg01'] = (
+    Auto['mpg'] > median_mpg
+).astype(int)
+
+print("Median MPG:", median_mpg)
+\end{lstlisting}
+
+The median MPG obtained from the dataset was
+
+\[
+\boxed{22.75}.
+\]
+
+Therefore,
+
+\[
+\texttt{mpg01}=1
+\]
+
+represents vehicles with MPG above 22.75, while
+
+\[
+\texttt{mpg01}=0
+\]
+
+represents vehicles with MPG below or equal to the median.
+
+\subsection{(b) Graphical Exploration and Predictor Selection}
+
+The relationship between \texttt{mpg01} and the available predictors was
+examined using graphical and numerical summaries.
+
+The strongest associations were observed for:
+
+\begin{itemize}
+    \item cylinders,
+    \item weight,
+    \item displacement,
+    \item horsepower,
+    \item year, and
+    \item origin.
+\end{itemize}
+
+The strongest negative associations were observed for cylinders, weight,
+displacement, and horsepower. This indicates that vehicles with larger
+engines, more cylinders, greater horsepower, and greater weight tend to
+have lower fuel efficiency.
+
+Year showed a positive association with \texttt{mpg01}, suggesting that
+newer vehicles tend to have better fuel efficiency.
+
+Based on these findings, the following predictors were used in the
+classification models:
+
+\[
+\boxed{
+\text{cylinders, displacement, horsepower, weight, year}
+}
+\]
+
+\subsection{(c) Training and Test Sets}
+
+The data were divided into training and test sets using a 50--50 split.
+The random state was set to 1 so that the results could be reproduced.
+
+\begin{lstlisting}
+from sklearn.model_selection import train_test_split
+
+features = [
+    'cylinders',
+    'displacement',
+    'horsepower',
+    'weight',
+    'year'
+]
+
+X = Auto[features]
+y = Auto['mpg01']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.5,
+    random_state=1,
+    stratify=y
+)
+\end{lstlisting}
+
+The resulting datasets contained 196 observations each.
+
+\subsection{(d) Linear Discriminant Analysis}
+
+LDA was fitted using the selected predictors.
+
+\begin{lstlisting}
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.metrics import accuracy_score
+
+lda = LinearDiscriminantAnalysis()
+
+lda.fit(X_train, y_train)
+
+lda_pred = lda.predict(X_test)
+
+lda_error = 1 - accuracy_score(y_test, lda_pred)
+
+print("LDA test error:", lda_error)
+\end{lstlisting}
+
+The test error obtained was approximately
+
+\[
+\boxed{9.69\%}.
+\]
+
+Therefore, the corresponding test accuracy was approximately
+
+\[
+\boxed{90.31\%}.
+\]
+
+\subsection{(e) Quadratic Discriminant Analysis}
+
+QDA was fitted using the same predictors.
+
+\begin{lstlisting}
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+qda = QuadraticDiscriminantAnalysis()
+
+qda.fit(X_train, y_train)
+
+qda_pred = qda.predict(X_test)
+
+qda_error = 1 - accuracy_score(y_test, qda_pred)
+
+print("QDA test error:", qda_error)
+\end{lstlisting}
+
+The test error was approximately
+
+\[
+\boxed{11.73\%}.
+\]
+
+The corresponding test accuracy was approximately
+
+\[
+\boxed{88.27\%}.
+\]
+
+QDA performed slightly worse than LDA on this particular split, suggesting
+that the additional flexibility of QDA was not beneficial for this dataset.
+
+\subsection{(f) Logistic Regression}
+
+Logistic regression was fitted as follows:
+
+\begin{lstlisting}
+from sklearn.linear_model import LogisticRegression
+
+logit = LogisticRegression(max_iter=5000)
+
+logit.fit(X_train, y_train)
+
+logit_pred = logit.predict(X_test)
+
+logit_error = 1 - accuracy_score(y_test, logit_pred)
+
+print("Logistic regression test error:", logit_error)
+\end{lstlisting}
+
+The test error was approximately
+
+\[
+\boxed{10.20\%},
+\]
+
+giving a test accuracy of approximately
+
+\[
+\boxed{89.80\%}.
+\]
+
+\subsection{(g) Naive Bayes}
+
+A Gaussian naive Bayes classifier was fitted using the selected predictors.
+
+\begin{lstlisting}
+from sklearn.naive_bayes import GaussianNB
+
+nb = GaussianNB()
+
+nb.fit(X_train, y_train)
+
+nb_pred = nb.predict(X_test)
+
+nb_error = 1 - accuracy_score(y_test, nb_pred)
+
+print("Naive Bayes test error:", nb_error)
+\end{lstlisting}
+
+The test error was approximately
+
+\[
+\boxed{11.22\%}.
+\]
+
+The corresponding accuracy was approximately
+
+\[
+\boxed{88.78\%}.
+\]
+
+\subsection{(h) K-Nearest Neighbors}
+
+KNN was evaluated using several values of $K$. Because KNN is based on
+distances, the predictors were standardized before fitting the classifier.
+
+\begin{lstlisting}
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
+for K in [1, 3, 5, 7, 9, 11]:
+
+    knn = make_pipeline(
+        StandardScaler(),
+        KNeighborsClassifier(n_neighbors=K)
+    )
+
+    knn.fit(X_train, y_train)
+
+    knn_pred = knn.predict(X_test)
+
+    error = 1 - accuracy_score(y_test, knn_pred)
+
+    print("K =", K, "Test error =", error)
+\end{lstlisting}
+
+The observed test errors were:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cc}
+\toprule
+$K$ & Test Error \\
+\midrule
+1 & 7.65\% \\
+3 & 8.16\% \\
+5 & 9.18\% \\
+7 & 10.20\% \\
+9 & 11.22\% \\
+11 & 11.22\% \\
+\bottomrule
+\end{tabular}
+\caption{KNN test errors for the Auto dataset.}
+\end{table}
+
+The best performance was obtained using
+
+\[
+\boxed{K=1}
+\]
+
+with a test error of approximately
+
+\[
+\boxed{7.65\%}.
+\]
+
+\subsection{Exercise 14 Summary}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Method & Test Error & Test Accuracy \\
+\midrule
+KNN ($K=1$) & 7.65\% & 92.35\% \\
+LDA & 9.69\% & 90.31\% \\
+Logistic Regression & 10.20\% & 89.80\% \\
+Naive Bayes & 11.22\% & 88.78\% \\
+QDA & 11.73\% & 88.27\% \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of classification methods for the Auto dataset.}
+\end{table}
+
+Among the methods tested, KNN with $K=1$ produced the lowest test error.
+LDA was the second-best method, while QDA produced the highest test error
+among the five approaches.
+
+The results also illustrate an important point from classification theory:
+greater model flexibility does not automatically result in better test
+performance.
+
+% =================================================
+% EXERCISE 16
+% =================================================
+
+\section{Exercise 16: Boston Dataset}
+
+The objective of this exercise is to predict whether a Boston suburb has a
+crime rate above or below the median using classification methods.
+
+\subsection{Creating the Binary Response}
+
+The first step is to create a binary response variable called
+\texttt{crim01}.
+
+\begin{lstlisting}
+from ISLP import load_data
+
+Boston = load_data('Boston')
+
+median_crim = Boston['crim'].median()
+
+Boston['crim01'] = (
+    Boston['crim'] > median_crim
+).astype(int)
+\end{lstlisting}
+
+The response variable is interpreted as follows:
+
+\begin{itemize}
+    \item \texttt{crim01 = 0}: crime rate below or equal to the median.
+    \item \texttt{crim01 = 1}: crime rate above the median.
+\end{itemize}
+
+The median crime rate was approximately
+
+\[
+\boxed{0.25651}.
+\]
+
+\subsection{Predictor Exploration}
+
+The available predictors were examined to identify variables that were most
+strongly associated with \texttt{crim01}.
+
+The variables selected for the classification models were:
+
+\[
+\boxed{
+\text{nox, rad, age, tax, indus, dis}
+}
+\]
+
+These variables showed relatively strong associations with whether a suburb
+had a crime rate above or below the median.
+
+\subsection{Training and Test Sets}
+
+The observations were divided into training and test sets using a 50--50
+split, with \texttt{random\_state=1} and stratification.
+
+\begin{lstlisting}
+from sklearn.model_selection import train_test_split
+
+features = [
+    'nox',
+    'rad',
+    'age',
+    'tax',
+    'indus',
+    'dis'
+]
+
+X = Boston[features]
+y = Boston['crim01']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.5,
+    random_state=1,
+    stratify=y
+)
+\end{lstlisting}
+
+\subsection{Logistic Regression}
+
+The logistic regression model produced a test error of approximately
+
+\[
+\boxed{15.42\%}.
+\]
+
+The corresponding test accuracy was approximately
+
+\[
+\boxed{84.58\%}.
+\]
+
+\subsection{Linear Discriminant Analysis}
+
+LDA produced a test error of approximately
+
+\[
+\boxed{16.21\%}.
+\]
+
+The corresponding accuracy was approximately
+
+\[
+\boxed{83.79\%}.
+\]
+
+\subsection{Naive Bayes}
+
+Gaussian naive Bayes produced a test error of approximately
+
+\[
+\boxed{17.00\%}.
+\]
+
+The corresponding accuracy was approximately
+
+\[
+\boxed{83.00\%}.
+\]
+
+\subsection{K-Nearest Neighbors}
+
+Several values of $K$ were evaluated.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cc}
+\toprule
+$K$ & Test Error \\
+\midrule
+1 & 6.72\% \\
+3 & 7.91\% \\
+5 & 7.51\% \\
+10 & 8.30\% \\
+\bottomrule
+\end{tabular}
+\caption{KNN test errors for the Boston dataset.}
+\end{table}
+
+The best result was obtained using
+
+\[
+\boxed{K=1}
+\]
+
+with a test error of approximately
+
+\[
+\boxed{6.72\%}.
+\]
+
+\subsection{Exercise 16 Summary}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Method & Test Error & Test Accuracy \\
+\midrule
+KNN ($K=1$) & 6.72\% & 93.28\% \\
+Logistic Regression & 15.42\% & 84.58\% \\
+LDA & 16.21\% & 83.79\% \\
+Naive Bayes & 17.00\% & 83.00\% \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of classification methods for the Boston dataset.}
+\end{table}
+
+KNN with $K=1$ achieved the lowest test error among the methods considered.
+Its performance was substantially better than logistic regression, LDA, and
+naive Bayes for this particular train-test split.
+
+% =================================================
+% OVERALL DISCUSSION
+% =================================================
+
+\section{Overall Discussion}
+
+The four exercises demonstrate several important principles of
+classification.
+
+First, LDA and QDA differ mainly in their assumptions about the covariance
+structure of the predictors. LDA assumes a common covariance matrix across
+classes and therefore produces a linear decision boundary. QDA allows
+class-specific covariance matrices and can therefore produce a quadratic
+decision boundary.
+
+Second, the additional flexibility of a model does not necessarily result in
+better test performance. QDA can fit more complex relationships than LDA,
+but this flexibility can increase variance and lead to poorer predictions
+when the additional complexity is unnecessary.
+
+Third, the computational exercises demonstrate that classification
+performance depends strongly on the dataset. There is no single
+classification method that is guaranteed to outperform all others in every
+problem.
+
+For the Auto dataset, KNN with $K=1$ achieved the lowest test error among the
+methods evaluated. For the Boston dataset, KNN with $K=1$ also achieved the
+lowest test error among the tested models.
+
+The KNN results should nevertheless be interpreted carefully. KNN is a
+non-parametric method and can have high variance, particularly when a small
+value of $K$ is used. The ISLP text notes that the choice of $K$ has an
+important effect on the flexibility of KNN and that $K=1$ can produce a very
+flexible classifier.
+
+% =================================================
+% CONCLUSION
+% =================================================
+
+\section{Conclusion}
+
+This chapter provided practical experience with several fundamental
+classification methods: logistic regression, LDA, QDA, naive Bayes, and
+KNN.
+
+Exercise 5 demonstrated the bias--variance trade-off between LDA and QDA.
+LDA is generally preferable when the true decision boundary is linear and
+the sample size is relatively small, while QDA becomes more attractive when
+the decision boundary is non-linear or when a sufficiently large sample is
+available.
+
+Exercise 10 showed mathematically that when there is one predictor, the LDA
+log posterior odds are a linear function of that predictor.
+
+Exercises 14 and 16 demonstrated the application of classification methods
+to real datasets. In the particular train-test splits used in this analysis,
+KNN with $K=1$ produced the lowest test error for both the Auto and Boston
+datasets.
+
+The exact test error rates depend on the training-test split. Therefore, the
+reported values should be interpreted as the results for the specified
+50--50 split with \texttt{random\_state=1}, rather than as universal
+properties of the datasets.
+
+Overall, the exercises demonstrate why model selection should be based on
+test performance and an understanding of the assumptions and flexibility of
+each classification method rather than simply choosing the most complex
+model.
+
+% =================================================
+% REFERENCES
+% =================================================
+
+\section{References}
+
+\begin{enumerate}
+
+\item James, G., Witten, D., Hastie, T., Tibshirani, R., \& Taylor, J.
+\textit{An Introduction to Statistical Learning with Applications in Python}.
+Springer, 2023.
+
+\item ISLP Python package and datasets used for the computational exercises.
+
+\item Scikit-learn documentation for classification methods including
+Logistic Regression, Linear Discriminant Analysis, Quadratic Discriminant
+Analysis, Gaussian Naive Bayes, and K-Nearest Neighbors.
+
+\end{enumerate}
+
+\end{document}
