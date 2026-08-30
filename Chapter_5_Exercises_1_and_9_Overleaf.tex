@@ -1,0 +1,501 @@
+
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{listings}
+\usepackage{float}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black
+}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    columns=fullflexible,
+    showstringspaces=false
+}
+
+\title{\textbf{Chapter 5: Resampling Methods}\\
+Exercises 1 and 9}
+\author{Student Name: \underline{\hspace{6cm}}\\
+Student ID: \underline{\hspace{6cm}}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Introduction}
+
+This report presents solutions to Exercises 1 and 9 from Chapter 5,
+\textit{Resampling Methods}, of \textit{An Introduction to Statistical
+Learning with Applications in Python (ISLP)}. Exercise 1 is a conceptual
+derivation involving the minimum-variance combination of two random
+variables. Exercise 9 applies bootstrap methods to the Boston housing
+data set to estimate the mean, median, and tenth percentile of the
+\texttt{medv} variable.
+
+The calculations in Exercise 9 were implemented in Python using the
+\texttt{ISLP} package. The bootstrap calculations use 10,000 bootstrap
+samples, with the random number generator initialized using seed 1.
+
+\section{Exercise 1}
+
+\subsection*{Question}
+
+Using the basic statistical properties of the variance, as well as
+single-variable calculus, derive equation (5.6). In other words, show
+that the value of $\alpha$ given by equation (5.6) minimizes
+\[
+\operatorname{Var}\left(\alpha X+(1-\alpha)Y\right).
+\]
+
+\subsection*{Solution}
+
+Let
+\[
+V(\alpha)=\operatorname{Var}\left(\alpha X+(1-\alpha)Y\right).
+\]
+
+Define
+\[
+\sigma_X^2=\operatorname{Var}(X), \qquad
+\sigma_Y^2=\operatorname{Var}(Y),
+\]
+and
+\[
+\sigma_{XY}=\operatorname{Cov}(X,Y).
+\]
+
+Using the variance formula
+\[
+\operatorname{Var}(aX+bY)
+=
+a^2\operatorname{Var}(X)
++b^2\operatorname{Var}(Y)
++2ab\operatorname{Cov}(X,Y),
+\]
+we obtain
+\[
+V(\alpha)
+=
+\alpha^2\sigma_X^2
++(1-\alpha)^2\sigma_Y^2
++2\alpha(1-\alpha)\sigma_{XY}.
+\]
+
+Expanding the terms gives
+\[
+V(\alpha)
+=
+\alpha^2\sigma_X^2
++
+(1-2\alpha+\alpha^2)\sigma_Y^2
++
+(2\alpha-2\alpha^2)\sigma_{XY}.
+\]
+
+Collecting terms according to powers of $\alpha$,
+\[
+V(\alpha)
+=
+\alpha^2
+(\sigma_X^2+\sigma_Y^2-2\sigma_{XY})
++
+\alpha(-2\sigma_Y^2+2\sigma_{XY})
++
+\sigma_Y^2.
+\]
+
+To find the value of $\alpha$ that minimizes the variance, differentiate
+with respect to $\alpha$:
+\[
+\frac{dV}{d\alpha}
+=
+2\alpha(\sigma_X^2+\sigma_Y^2-2\sigma_{XY})
+-2\sigma_Y^2+2\sigma_{XY}.
+\]
+
+At the minimum,
+\[
+\frac{dV}{d\alpha}=0.
+\]
+
+Therefore,
+\[
+2\alpha(\sigma_X^2+\sigma_Y^2-2\sigma_{XY})
+-2\sigma_Y^2+2\sigma_{XY}=0.
+\]
+
+Dividing by 2,
+\[
+\alpha(\sigma_X^2+\sigma_Y^2-2\sigma_{XY})
+=
+\sigma_Y^2-\sigma_{XY}.
+\]
+
+Hence,
+\[
+\boxed{
+\hat{\alpha}
+=
+\frac{\sigma_Y^2-\sigma_{XY}}
+{\sigma_X^2+\sigma_Y^2-2\sigma_{XY}}
+}
+\]
+
+which is the required result.
+
+\subsection*{Verification that the solution is a minimum}
+
+We take the second derivative:
+\[
+\frac{d^2V}{d\alpha^2}
+=
+2(\sigma_X^2+\sigma_Y^2-2\sigma_{XY}).
+\]
+
+Notice that
+\[
+\sigma_X^2+\sigma_Y^2-2\sigma_{XY}
+=
+\operatorname{Var}(X-Y).
+\]
+
+Since variance is non-negative,
+\[
+\operatorname{Var}(X-Y)\geq 0.
+\]
+
+Therefore,
+\[
+\frac{d^2V}{d\alpha^2}\geq 0.
+\]
+
+Thus, the value of $\hat{\alpha}$ obtained above minimizes
+$\operatorname{Var}(\alpha X+(1-\alpha)Y)$.
+
+\section{Exercise 9: Boston Housing Data}
+
+\subsection*{Data and Method}
+
+The Boston housing data set contains 506 observations. The variable
+\texttt{medv} represents the median value of owner-occupied homes for
+Boston census tracts, measured in thousands of dollars.
+
+For parts (c), (f), and (h), bootstrap sampling was used. Each bootstrap
+sample contains 506 observations selected with replacement from the
+original data. The relevant statistic was calculated for each of 10,000
+bootstrap samples. The bootstrap standard error was then estimated as
+the standard deviation of the resulting bootstrap statistics.
+
+\subsection*{Python setup}
+
+The data were loaded as follows:
+
+\begin{lstlisting}
+from ISLP import load_data
+import numpy as np
+
+Boston = load_data("Boston")
+Boston.head()
+\end{lstlisting}
+
+\subsection*{(a) Estimate the population mean}
+
+The population mean is estimated using the sample mean:
+\[
+\hat{\mu}=\bar{x}.
+\]
+
+In Python:
+
+\begin{lstlisting}
+mu_hat = Boston['medv'].mean()
+print(mu_hat)
+\end{lstlisting}
+
+The result is
+\[
+\boxed{\hat{\mu}=22.5328063}.
+\]
+
+Therefore, the estimated population mean of \texttt{medv} is
+approximately $22.53$ thousand dollars.
+
+\subsection*{(b) Estimate the standard error of $\hat{\mu}$}
+
+The standard error of the sample mean is estimated using
+\[
+SE(\hat{\mu})=\frac{s}{\sqrt{n}},
+\]
+where $s$ is the sample standard deviation and $n$ is the number of
+observations.
+
+The Python implementation is:
+
+\begin{lstlisting}
+se_mu = Boston['medv'].std() / np.sqrt(Boston.shape[0])
+print(se_mu)
+\end{lstlisting}
+
+The result is
+\[
+\boxed{SE(\hat{\mu})=0.4088611}.
+\]
+
+This means that the sampling variability of the estimated mean is about
+$0.409$ thousand dollars.
+
+\subsection*{(c) Bootstrap estimate of the standard error}
+
+The bootstrap procedure was used to estimate the standard error of the
+mean. The procedure repeatedly draws samples of size 506 with
+replacement and calculates the mean of each sample.
+
+\begin{lstlisting}
+rng = np.random.default_rng(1)
+
+bootstrap_means = []
+
+for i in range(10000):
+    sample = rng.choice(
+        Boston['medv'],
+        size=len(Boston),
+        replace=True
+    )
+
+    bootstrap_means.append(sample.mean())
+
+bootstrap_se = np.std(bootstrap_means, ddof=1)
+
+print(bootstrap_se)
+\end{lstlisting}
+
+The bootstrap standard error is
+\[
+\boxed{SE_{\text{bootstrap}}(\hat{\mu})=0.4097871}.
+\]
+
+The analytical standard error from part (b) was $0.4088611$, while the
+bootstrap estimate is $0.4097871$. The two estimates are extremely close.
+This indicates that the bootstrap provides a good estimate of the
+sampling variability of the sample mean in this data set.
+
+\subsection*{(d) 95\% confidence interval for the population mean}
+
+The exercise suggests the approximate confidence interval
+\[
+\left[
+\hat{\mu}-2SE(\hat{\mu}),
+\hat{\mu}+2SE(\hat{\mu})
+\right].
+\]
+
+Using the bootstrap standard error from part (c),
+\[
+\hat{\mu}=22.5328063
+\]
+and
+\[
+SE_{\text{bootstrap}}=0.4097871.
+\]
+
+Therefore,
+\[
+22.5328063-2(0.4097871)=21.7132322
+\]
+and
+\[
+22.5328063+2(0.4097871)=23.3523805.
+\]
+
+Thus, the approximate 95\% confidence interval is
+\[
+\boxed{[21.7132,\;23.3524]}.
+\]
+
+The Python calculation is:
+
+\begin{lstlisting}
+lower = mu_hat - 2 * bootstrap_se
+upper = mu_hat + 2 * bootstrap_se
+
+print(lower, upper)
+\end{lstlisting}
+
+Hence, we estimate that the population mean of \texttt{medv} lies
+approximately between $21.71$ and $23.35$ thousand dollars.
+
+\subsection*{(e) Estimate the population median}
+
+The population median is estimated using the sample median:
+
+\begin{lstlisting}
+mu_med = Boston['medv'].median()
+print(mu_med)
+\end{lstlisting}
+
+The result is
+\[
+\boxed{\hat{\mu}_{med}=21.2}.
+\]
+
+Therefore, the estimated population median of \texttt{medv} is
+$21.2$ thousand dollars.
+
+\subsection*{(f) Bootstrap standard error of the median}
+
+Unlike the sample mean, there is no simple formula of the same form for
+the standard error of the median. Therefore, the bootstrap is used.
+
+\begin{lstlisting}
+bootstrap_medians = []
+
+for i in range(10000):
+    sample = rng.choice(
+        Boston['medv'],
+        size=len(Boston),
+        replace=True
+    )
+
+    bootstrap_medians.append(np.median(sample))
+
+bootstrap_median_se = np.std(
+    bootstrap_medians,
+    ddof=1
+)
+
+print(bootstrap_median_se)
+\end{lstlisting}
+
+The bootstrap estimate of the standard error is
+\[
+\boxed{SE_{\text{bootstrap}}(\hat{\mu}_{med})=0.3813021}.
+\]
+
+This shows that the estimated median has sampling variability of about
+$0.381$ thousand dollars. The bootstrap is useful here because it
+provides a practical estimate of uncertainty without requiring a simple
+analytical formula for the median's standard error.
+
+\subsection*{(g) Estimate the tenth percentile}
+
+The tenth percentile is estimated using NumPy's
+\texttt{percentile()} function:
+
+\begin{lstlisting}
+np.percentile(Boston['medv'], 10)
+\end{lstlisting}
+
+The result is
+\[
+\boxed{\hat{\mu}_{0.1}=12.75}.
+\]
+
+Thus, approximately 10\% of the observations have a \texttt{medv} value
+below $12.75$ thousand dollars.
+
+\subsection*{(h) Bootstrap standard error of the tenth percentile}
+
+The bootstrap was again used, this time calculating the tenth percentile
+for every bootstrap sample.
+
+\begin{lstlisting}
+bootstrap_percentiles = []
+
+for i in range(10000):
+    sample = rng.choice(
+        Boston['medv'],
+        size=len(Boston),
+        replace=True
+    )
+
+    bootstrap_percentiles.append(
+        np.percentile(sample, 10)
+    )
+
+bootstrap_percentile_se = np.std(
+    bootstrap_percentiles,
+    ddof=1
+)
+
+print(bootstrap_percentile_se)
+\end{lstlisting}
+
+The resulting bootstrap standard error is
+\[
+\boxed{SE_{\text{bootstrap}}(\hat{\mu}_{0.1})=0.4999335}.
+\]
+
+This indicates that the estimated tenth percentile has a sampling
+variability of approximately $0.500$ thousand dollars. The standard
+error is larger than the standard error of the mean because percentile
+estimation, especially toward the lower tail of a distribution, can be
+more variable.
+
+\section{Summary of Results}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.2cm}
+                >{\raggedright\arraybackslash}p{6.0cm}
+                >{\raggedleft\arraybackslash}p{3.0cm}}
+\toprule
+\textbf{Part} & \textbf{Quantity} & \textbf{Result} \\
+\midrule
+9(a) & Sample estimate of population mean & 22.5328 \\
+9(b) & Analytical standard error of mean & 0.4089 \\
+9(c) & Bootstrap standard error of mean & 0.4098 \\
+9(d) & Approximate 95\% confidence interval & [21.7132, 23.3524] \\
+9(e) & Sample estimate of population median & 21.2 \\
+9(f) & Bootstrap standard error of median & 0.3813 \\
+9(g) & Tenth percentile & 12.75 \\
+9(h) & Bootstrap standard error of tenth percentile & 0.4999 \\
+\bottomrule
+\end{tabular}
+\caption{Results obtained from the Boston housing data.}
+\end{table}
+
+\section{Conclusion}
+
+Exercise 1 demonstrates how basic variance properties and differentiation
+can be used to obtain the minimum-variance weight for a combination of
+two random variables. The resulting estimator is
+\[
+\hat{\alpha}
+=
+\frac{\sigma_Y^2-\sigma_{XY}}
+{\sigma_X^2+\sigma_Y^2-2\sigma_{XY}}.
+\]
+
+Exercise 9 demonstrates the practical value of the bootstrap. For the
+Boston housing data, the bootstrap estimate of the standard error of the
+mean ($0.4098$) was very close to the analytical standard error
+($0.4089$). The bootstrap was also used to estimate the standard errors
+of the median and tenth percentile, for which a simple standard-error
+formula is not directly available in the exercise.
+
+Overall, the results show how resampling can be used to quantify the
+uncertainty associated with statistical estimates using repeated samples
+drawn from the observed data.
+
+\section*{Reference}
+
+James, G., Witten, D., Hastie, T., Tibshirani, R., \& Taylor, J.
+\textit{An Introduction to Statistical Learning with Applications in
+Python}. Springer, 2023.
+
+\end{document}
